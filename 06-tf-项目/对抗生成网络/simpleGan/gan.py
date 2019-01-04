@@ -1,3 +1,5 @@
+# coding=gbk
+
 import argparse
 import numpy as np
 from scipy.stats import norm
@@ -12,7 +14,7 @@ seed = 42
 np.random.seed(seed)
 tf.set_random_seed(seed)
 
-
+#正态分布数据生成类
 class DataDistribution(object):
     def __init__(self):
         self.mu = 4
@@ -23,7 +25,7 @@ class DataDistribution(object):
         samples.sort()
         return samples
 
-
+#这里是产生随机点，作为G的输入
 class GeneratorDistribution(object):
     def __init__(self, range):
         self.range = range
@@ -32,7 +34,7 @@ class GeneratorDistribution(object):
         return np.linspace(-self.range, self.range, N) + \
             np.random.random(N) * 0.01
 
-
+#构造tf的线性变换op，输入二维。get_variable获取变量
 def linear(input, output_dim, scope=None, stddev=1.0):
     norm = tf.random_normal_initializer(stddev=stddev)
     const = tf.constant_initializer(0.0)
@@ -41,13 +43,15 @@ def linear(input, output_dim, scope=None, stddev=1.0):
         b = tf.get_variable('b', [output_dim], initializer=const)
         return tf.matmul(input, w) + b
 
-
+# 生成网络
+# 激活函数：softplus，计算log(exp(features) + 1)
 def generator(input, h_dim):
     h0 = tf.nn.softplus(linear(input, h_dim, 'g0'))
     h1 = linear(h0, 1, 'g1')
     return h1
 
-
+#判别网络
+#激活函数：tanh
 def discriminator(input, h_dim):
     h0 = tf.tanh(linear(input, h_dim * 2, 'd0'))
     h1 = tf.tanh(linear(h0, h_dim * 2, 'd1'))   
@@ -56,6 +60,8 @@ def discriminator(input, h_dim):
     h3 = tf.sigmoid(linear(h2, 1, scope='d3'))
     return h3
 
+#优化器
+#学习率采用指数衰减法：exponential_decay
 def optimizer(loss, var_list, initial_learning_rate):
     decay = 0.95
     num_decay_steps = 150
@@ -74,7 +80,6 @@ def optimizer(loss, var_list, initial_learning_rate):
     )
     return optimizer
 
-
 class GAN(object):
     def __init__(self, data, gen, num_steps, batch_size, log_every):
         self.data = data
@@ -82,7 +87,7 @@ class GAN(object):
         self.num_steps = num_steps
         self.batch_size = batch_size
         self.log_every = log_every
-        self.mlp_hidden_size = 4
+        self.mlp_hidden_size = 4 #隐藏层神经元个数
         
         self.learning_rate = 0.03
 
@@ -116,6 +121,7 @@ class GAN(object):
 
         # Define the loss for discriminator and generator networks (see the original
         # paper for details), and create optimizers for both
+        #最为关键的损失函数，体现了对抗的思想。
         self.loss_d = tf.reduce_mean(-tf.log(self.D1) - tf.log(1 - self.D2))
         self.loss_g = tf.reduce_mean(-tf.log(self.D2))
 
@@ -198,6 +204,7 @@ class GAN(object):
         plt.ylabel('Probability density')
         plt.legend()
         plt.show()
+
 def main(args):
     model = GAN(
         DataDistribution(),
@@ -211,14 +218,13 @@ def main(args):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num-steps', type=int, default=1200,
-                        help='the number of training steps to take')
-    parser.add_argument('--batch-size', type=int, default=12,
-                        help='the batch size')
-    parser.add_argument('--log-every', type=int, default=10,
-                        help='print loss after this many steps')
+    #迭代次数
+    parser.add_argument('--num-steps', type=int, default=1200, help='the number of training steps to take')
+    #每批次的size，每个迭代的大小
+    parser.add_argument('--batch-size', type=int, default=12, help='the batch size')
+    #迭代多少次打印一次日志
+    parser.add_argument('--log-every', type=int, default=10, help='print loss after this many steps')
     return parser.parse_args()
-
 
 if __name__ == '__main__':
     main(parse_args())

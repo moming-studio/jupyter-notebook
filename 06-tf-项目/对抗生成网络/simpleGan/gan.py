@@ -122,6 +122,7 @@ class GAN(object):
         # Define the loss for discriminator and generator networks (see the original
         # paper for details), and create optimizers for both
         #最为关键的损失函数，体现了对抗的思想。
+        #D网络期望D1趋近1，D2趋近0；G网络期望D2趋近1；形成对抗，寻找平衡。
         self.loss_d = tf.reduce_mean(-tf.log(self.D1) - tf.log(1 - self.D2))
         self.loss_g = tf.reduce_mean(-tf.log(self.D2))
 

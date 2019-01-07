@@ -1,1 +1,9 @@
 .ipynb_checkpoints
+/06-tf-项目/生成对抗网络/DCGAN/data/mnist
+/06-tf-项目/生成对抗网络/DCGAN/data/faces_
+/06-tf-项目/生成对抗网络/DCGAN-tensorflow-master/data
+/06-tf-项目/生成对抗网络/DCGAN/__pycache__
+/06-tf-项目/生成对抗网络/DCGAN-tensorflow-master/samples
+/06-tf-项目/生成对抗网络/DCGAN-tensorflow-master/__pycache__
+/06-tf-项目/生成对抗网络/DCGAN-tensorflow-master/checkpoint
+/06-tf-项目/生成对抗网络/DCGAN-tensorflow-master/logs

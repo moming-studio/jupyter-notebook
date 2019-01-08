@@ -1,8 +1,7 @@
 import numpy as np
-from gridworld import GridworldEnv
+from  gridworld import GridWorldEnv
 
-
-env = GridworldEnv()
+env = GridWorldEnv()
 
 def value_iteration(env, theta=0.0001, discount_factor=1.0):
     """
@@ -31,7 +30,7 @@ def value_iteration(env, theta=0.0001, discount_factor=1.0):
         """
         A = np.zeros(env.nA)
         for a in range(env.nA):
-            for prob, next_state, reward, done in env.P[state][a]:
+            for prob, next_state, reward, done in env.p[state][a]:
                 A[a] += prob * (reward + discount_factor * V[next_state])
         return A
     
